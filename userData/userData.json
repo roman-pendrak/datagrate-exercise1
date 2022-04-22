@@ -1,0 +1,25 @@
+{
+"users": [ {
+"userid": 123,
+"firstName": "John",
+"lastName": "doe",
+"age": 26,
+"address": {
+"streetAddress": "naist street",
+"city": "Nara",
+"postalCode": "630-0192"
+}
+},
+{
+"userid": 234,
+"firstName": "John2",
+"lastName": "doe2",
+"age": 26,
+"address": {
+"streetAddress": "naist street",
+"city": "Nara",
+"postalCode": "630-0192"
+}
+}
+]
+}
