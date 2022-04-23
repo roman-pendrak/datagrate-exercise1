@@ -9,5 +9,5 @@ public class DatagrateExercise1Application {
 	public static void main(String[] args) {
 		SpringApplication.run(DatagrateExercise1Application.class, args);
 	}
-
+	
 }

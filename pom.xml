@@ -37,9 +37,16 @@
 		    <version>1.1.1</version>
 		</dependency>
 		<dependency>
+		    <groupId>org.apache.camel</groupId>
+		    <artifactId>camel-jsonpath</artifactId>
+		    <version>3.16.0</version>
+		</dependency>
+		<dependency>
 		    <groupId>com.jayway.jsonpath</groupId>
 		    <artifactId>json-path</artifactId>
-	    </dependency>
+		    <version>2.7.0</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

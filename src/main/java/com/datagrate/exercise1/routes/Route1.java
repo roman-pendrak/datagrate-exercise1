@@ -18,7 +18,12 @@ public class Route1 extends RouteBuilder {
 		public void configure() throws Exception {
 			restConfiguration().component("servlet").port(8080).host("localhost").bindingMode(RestBindingMode.json);
 
-			rest().get("/getUserById").produces(MediaType.APPLICATION_JSON_VALUE).route().process(processor).endRest();
+			// solution 1 using processor
+			rest().get("processor/getUserById/").produces(MediaType.APPLICATION_JSON_VALUE).route().process(processor).endRest();	
 			
+			// solution 2 using strictly camel DSL 
+			rest().get("/getUserById").produces(MediaType.APPLICATION_JSON_VALUE).route().setProperty("userid", simple("${headers.userid}"))
+				.pollEnrich("file:userData/?fileName=userData.json&noop=true&idempotent=false", 5000).setBody().jsonpath("$.users..[?(@.userid==${header.userid})]").endRest();
+
 		}
 }
