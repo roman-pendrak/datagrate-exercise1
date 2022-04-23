@@ -26,7 +26,7 @@ public class Route1 extends RouteBuilder {
 				.endRest();	
 			
 			// solution 2 using strictly camel DSL - using pollEnrich to load file into message 
-			rest().get("camel-dsl/getUserById")
+			rest().get("poll-enrich/getUserById")
 				.produces(MediaType.APPLICATION_JSON_VALUE)
 				.route()
 				.setProperty("userid", simple("${headers.userid}"))
@@ -35,7 +35,7 @@ public class Route1 extends RouteBuilder {
 				.endRest();
 			
 			// solution 3 using strictly camel DSL - using simple language to read file resource and route to extractUserData endpoint
-			rest().get("camel-dsl-simple/getUserById")
+			rest().get("simple/getUserById")
 				.produces(MediaType.APPLICATION_JSON_VALUE)
 				.route()
 				.setProperty("userid", simple("${headers.userid}"))
@@ -46,6 +46,33 @@ public class Route1 extends RouteBuilder {
 				.setBody()
 				.jsonpath("$.users..[?(@.userid==${exchangeProperty.userid})]")
 				.endRest();
-
+			
+			// endpoint with execution options via 'solution' param
+			rest().get("getUserById/")
+				.produces(MediaType.APPLICATION_JSON_VALUE)
+				.route()
+				.choice()
+				.when().simple("${headers.solution} == 1")
+					.log("${date:now:yyyy/MM/dd-HH:mm:ss.SS} | starting solution 1")
+					.process(processor)
+					.log("${date:now:yyyy/MM/dd-HH:mm:ss.SS} | finished solution 1")
+					.endChoice()
+				.when().simple("${headers.solution} == 2")
+					.log("${date:now:yyyy/MM/dd-HH:mm:ss.SS} | starting solution 2")
+					.setProperty("userid", simple("${headers.userid}"))
+					.pollEnrich("file:userData/?fileName=userData.json&noop=true&idempotent=false", 5000)
+					.setBody().jsonpath("$.users..[?(@.userid==${exchangeProperty.userid})]")
+					.log("${date:now:yyyy/MM/dd-HH:mm:ss.SS} | finished solution 2")
+					.endChoice()
+				.when().simple("${headers.solution} == 3")
+					.log("${date:now:yyyy/MM/dd-HH:mm:ss.SS} | starting solution 3")
+					.setProperty("userid", simple("${headers.userid}"))
+					.setBody().simple("resource:file:userData/userData.json")
+					.to("direct-vm:extractUserData")
+					.log("${date:now:yyyy/MM/dd-HH:mm:ss.SS} | finished solution 3")
+					.endChoice()
+				.otherwise().log("invalid solution value").endChoice()
+				.endRest();
+					
 		}
 }
